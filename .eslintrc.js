@@ -11,5 +11,13 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "always",
+        "json": "always"
+      }
+    ]
   },
 };

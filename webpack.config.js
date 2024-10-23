@@ -69,6 +69,16 @@ const CONFIG = {
   module: {
     rules: [
       {
+        test: /\.js$/, 
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'], 
+          },
+        },
+      },
+      {
         test: /\.(css|scss)$/i,
         use: [
           {
@@ -121,12 +131,6 @@ if (!devMode) {
   CONFIG.output.publicPath = './';
   CONFIG.output.filename = 'js/app.js';
   CONFIG.plugins.push(new MinifyPlugin());
-  CONFIG.module.rules.push({
-    test: [/\.js$/],
-    exclude: [/node_modules/],
-    loader: 'babel-loader',
-    options: { presets: ['env'] },
-  });
 }
 
-module.exports = CONFIG;
+module.exports = CONFIG

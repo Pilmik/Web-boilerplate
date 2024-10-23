@@ -1,3 +1,6 @@
+import { randomUserMock, additionalUsers } from './FE4U-Lab2-mock.js';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
+
 // const testModules = require('./test-module');
 // require('../css/app.css');
 
@@ -67,5 +70,382 @@ prevButton.addEventListener('click', () => {
     behavior: 'smooth',
   });
 });
+
+// =======Lab02======= //
+
+// =======Task 1======= //
+let idCounter = 1;
+
+function consolidateUsers(rUsers, aUsers) {
+  const courses = [
+    'Mathematics', 'Physics', 'English', 'Computer Science', 'Dancing',
+    'Chess', 'Biology', 'Chemistry', 'Law', 'Art', 'Medicine', 'Statistics',
+  ];
+
+  const formattedRandomUsers = [];
+  const formattedAddUsers = [];
+
+  function getRandomCourse() {
+    return courses[Math.floor(Math.random() * courses.length)];
+  }
+
+  function findMatchingUser(fullName, Users) {
+    return Users.find((user) => fullName === user.full_name);
+  }
+
+  function calculateAge(birthDate) {
+    const today = new Date();
+    const birth = new Date(birthDate);
+
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    const dayDiff = today.getDate() - birth.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age -= 1;
+    }
+
+    return age;
+  }
+
+  function formatRandomUsers(randomUsers) {
+    randomUsers.forEach(({
+      gender: g = null,
+      name: { title: t = null, first: f = null, last: l = null } = {},
+      location: {
+        city: c = null,
+        state: s = null,
+        country: ct = null,
+        postcode: pc = null,
+        coordinates: coor = null,
+        timezone: tmz = null,
+      } = {},
+      email: em = null,
+      dob: { date: d = null, age: ag = null } = {},
+      phone: ph = null,
+      id: { name: nm = null, value: vl = null } = {},
+      picture: { large: lg = null, thumbnail: thb = null } = {},
+      nat = null,
+    }) => {
+      const calculatedAge = ag ?? (d ? calculateAge(d) : null);
+      const isMatched = findMatchingUser(`${f} ${l}`, additionalUsers);
+      const userId = nm && vl ? `${nm}${vl}` : isMatched?.id ?? `TEMP_ID${idCounter += 1}`;
+      const fav = isMatched?.favorite ?? false;
+      const cour = getRandomCourse();
+      const bgc = isMatched?.bg_color ?? '#fc6c5c';
+      const nt = isMatched?.note ?? '';
+      formattedRandomUsers.push({
+        gender: g,
+        title: t,
+        full_name: `${f} ${l}`,
+        city: c,
+        state: s,
+        country: ct,
+        nat,
+        postcode: pc,
+        coordinates: coor,
+        timezone: tmz,
+        email: em,
+        b_date: d,
+        age: calculatedAge,
+        phone: ph,
+        picture_large: lg,
+        picture_thumbnail: thb,
+        id: userId,
+        favorite: fav,
+        course: cour,
+        bg_color: bgc,
+        note: nt,
+      });
+    });
+  }
+  function formatAdditionalUsers(addUsers) {
+    addUsers.forEach(({
+      gender: g = null,
+      title: t = null,
+      full_name: fn = null,
+      city: c = null,
+      state: s = null,
+      country: ct = null,
+      nat = null,
+      postcode: pc = null,
+      coordinates: coor = null,
+      timezone: tmz = null,
+      email: em = null,
+      b_day: bd = null,
+      age: ag = null,
+      picture_large: lg = null,
+      picture_thumbnail: thb = null,
+      id: userId = null,
+      favorite: fav = null,
+      bg_color: bgc = null,
+      note: nt = null,
+    }) => {
+      const calculatedAge = ag ?? (bd ? calculateAge(bd) : null);
+      const safeFn = fn ?? '';
+      const isMatched = findMatchingUser(safeFn, formattedRandomUsers);
+      const finalId = userId === null ? `TEMP_ID${idCounter += 1}` : userId;
+      const finalFavorite = fav === null ? false : fav;
+      const finalBgColor = bgc === null ? '#fc6c5c' : bgc;
+      const finalNote = nt === null ? '' : nt;
+      if (isMatched) {
+        return;
+      }
+      formattedAddUsers.push({
+        gender: g,
+        title: t,
+        full_name: fn,
+        city: c,
+        state: s,
+        country: ct,
+        nat,
+        postcode: pc,
+        coordinates: coor,
+        timezone: tmz,
+        email: em,
+        b_date: bd,
+        age: calculatedAge,
+        picture_large: lg,
+        picture_thumbnail: thb,
+        id: finalId,
+        favorite: finalFavorite,
+        course: getRandomCourse(),
+        bg_color: finalBgColor,
+        note: finalNote,
+      });
+    });
+  }
+
+  formatRandomUsers(rUsers);
+  formatAdditionalUsers(aUsers);
+
+  return [...formattedRandomUsers, ...formattedAddUsers];
+}
+
+// =======Task 2======= //
+function isUpper(char) {
+  return char === char.toUpperCase() && char !== char.toLowerCase();
+}
+
+function isValidNumber(phone, nat) {
+  if (typeof phone !== 'string' || !phone.trim()) {
+    return false;
+  }
+  if (typeof nat !== 'string' || !nat.trim()) {
+    return false;
+  }
+  const phoneNumber = parsePhoneNumberFromString(phone, nat);
+
+  return phoneNumber && phoneNumber.isValid();
+}
+
+function isValidUser(user) {
+  const errors = {};
+
+  const properties = ['full_name', 'gender', 'state', 'city', 'country'];
+  properties.forEach((p) => {
+    if (!user[p]) {
+      errors[p] = `${p} is required.`;
+    } else if (typeof user[p] !== 'string' || !isUpper(user[p][0])) {
+      errors[p] = `${p} must start with a capital letter and be a string.`;
+    }
+  });
+
+  if (user.note && (typeof user.note !== 'string' || !isUpper(user.note[0]))) {
+    errors.note = 'Note must start with a capital letter and be a string.';
+  }
+
+  if (typeof user.age !== 'number' || Number.isNaN(user.age)) {
+    errors.age = 'age must be a number.';
+  }
+
+  if (!isValidNumber(user.phone, user.nat)) {
+    errors.phone = 'invalid phone number or cannot be recognized.';
+  }
+
+  if (typeof user.email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+    errors.email = 'email must be a valid email address.';
+  }
+
+  const isValid = Object.keys(errors).length === 0;
+
+  return {
+    isValid,
+    errors,
+  };
+}
+
+// =======Task 3======= //
+function filterUsers(users, {
+  country = false, age = false, gender = false, favorite = false,
+} = {}) {
+  let filteredUsers = [...users];
+
+  if (country) {
+    filteredUsers = filteredUsers.filter((user) => user.country === country);
+  }
+
+  if (age) {
+    if (age.includes('-')) {
+      const [minAge, maxAge] = age.split('-').map(Number);
+      filteredUsers = filteredUsers.filter((user) => user.age >= minAge && user.age <= maxAge);
+    } else if (age.includes('+')) {
+      const minAge = parseInt(age, 10);
+      filteredUsers = filteredUsers.filter((user) => user.age >= minAge);
+    }
+  }
+
+  if (gender) {
+    filteredUsers = filteredUsers.filter((user) => user.gender === gender);
+  }
+
+  if (favorite) {
+    filteredUsers = filteredUsers.filter((user) => user.favorite === favorite);
+  }
+
+  return filteredUsers;
+}
+
+// =======Task 4======= //
+function sortingUsers(users, { category, descending = false } = {}) {
+  const sortCategories = ['full_name', 'age', 'b_day', 'country'];
+  const sortedUsers = [...users];
+
+  if (!sortCategories.includes(category)) {
+    return [];
+  }
+
+  if (category === 'full_name') {
+    sortedUsers.sort((a, b) => {
+      const nameA = a.full_name ? a.full_name.toLowerCase() : '';
+      const nameB = b.full_name ? b.full_name.toLowerCase() : '';
+
+      if (nameA < nameB) return descending ? 1 : -1;
+      if (nameA > nameB) return descending ? -1 : 1;
+      return 0;
+    });
+  }
+
+  if (category === 'age') {
+    sortedUsers.sort((a, b) => {
+      const ageA = a.age !== null ? a.age : Infinity;
+      const ageB = b.age !== null ? b.age : Infinity;
+
+      return descending ? ageB - ageA : ageA - ageB;
+    });
+  }
+
+  if (category === 'b_day') {
+    sortedUsers.sort((a, b) => {
+      const dateA = a.b_date ? new Date(a.b_date) : new Date(0);
+      const dateB = b.b_date ? new Date(b.b_date) : new Date(0);
+
+      return descending ? dateB - dateA : dateA - dateB;
+    });
+  }
+
+  if (category === 'country') {
+    sortedUsers.sort((a, b) => {
+      const countryA = a.country ? a.country.toLowerCase() : '';
+      const countryB = b.country ? b.country.toLowerCase() : '';
+
+      if (countryA < countryB) return descending ? 1 : -1;
+      if (countryA > countryB) return descending ? -1 : 1;
+      return 0;
+    });
+  }
+
+  return sortedUsers;
+}
+
+// =======Task 5======= //
+
+function findUsers(users, input) {
+  const foundedUsers = [...users];
+
+  if (typeof input === 'number') {
+    return foundedUsers.filter((user) => user.age === input);
+  }
+
+  const cleanedInput = input.replace(/\s+/g, ' ').trim();
+  const fullNamePattern = /^[A-Za-z]+( [A-Za-z]+)?$/;
+  const agePattern = /^[<>]=?\d+$|^\d+$/;
+
+  if (fullNamePattern.test(cleanedInput)) {
+    const result = foundedUsers.filter((user) => user.full_name
+    && user.full_name.toLowerCase().includes(cleanedInput.toLowerCase()));
+    if (result.length > 0) {
+      return result;
+    }
+  }
+  if (agePattern.test(cleanedInput)) {
+    let operator = '=';
+    let searchValue = cleanedInput;
+
+    if (/^[<>]=?\d+$/.test(cleanedInput)) {
+      const [firstChar, secondChar] = cleanedInput;
+      operator = firstChar;
+      if (secondChar === '=') {
+        operator += '=';
+      }
+      searchValue = parseInt(cleanedInput.replace(/[<>=]/g, '').trim(), 10);
+    } else {
+      searchValue = parseInt(cleanedInput, 10);
+    }
+
+    return foundedUsers.filter((user) => {
+      const userAge = user.age;
+      switch (operator) {
+        case '>':
+          return userAge > searchValue;
+        case '>=':
+          return userAge >= searchValue;
+        case '<':
+          return userAge < searchValue;
+        case '<=':
+          return userAge <= searchValue;
+        case '=':
+        default:
+          return userAge === searchValue;
+      }
+    });
+  }
+
+  return foundedUsers.filter((user) => user.note
+  && user.note.toLowerCase().includes(cleanedInput.toLowerCase()));
+}
+
+// =======Task 6======= //
+
+function findPercentage(users, input) {
+  const foundedUsers = findUsers(users, input);
+  const allUsers = users.length;
+
+  if (allUsers === 0) {
+    return 0;
+  }
+
+  const numberOfUsersFound = foundedUsers.length;
+  const percentage = (numberOfUsersFound / allUsers) * 100;
+
+  return Number(percentage.toFixed(2));
+}
+
+const testArray = consolidateUsers(randomUserMock, additionalUsers);
+console.log(testArray);
+
+console.log([...testArray].map(isValidUser));
+
+console.log(filterUsers(testArray, {
+  country: 'Germany', age: '30+', gender: 'Female',
+}));
+
+console.log(sortingUsers(testArray, { category: 'b_day' }));
+
+console.log(sortingUsers(findUsers(testArray, '>=40'), { category: 'age', descending: false }));
+
+console.log(findPercentage(testArray, '>70'));
+
+console.log("Test");
 
 // console.log(testModules.hello);
