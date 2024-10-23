@@ -16,7 +16,7 @@ const CONFIG = {
   devtool: 'cheap-module-source-map',
   output: {
     path: path.resolve(__dirname, './build'),
-    filename: 'bundle.js',
+    filename: 'app.js',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -31,7 +31,7 @@ const CONFIG = {
     new HtmlReplaceWebpackPlugin([
       {
         pattern:
-          '<script type="text/javascript" src="../build/bundle.js"></script>',
+          '<script type="text/javascript" src="../build/app.js"></script>',
         replacement: '',
       },
       {
