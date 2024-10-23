@@ -16,7 +16,7 @@ const CONFIG = {
   devtool: 'cheap-module-source-map',
   output: {
     path: path.resolve(__dirname, './build'),
-    filename: 'app.js',
+    filename: 'bundle.js',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -31,7 +31,7 @@ const CONFIG = {
     new HtmlReplaceWebpackPlugin([
       {
         pattern:
-          '<script type="text/javascript" src="../build/app.js"></script>',
+          '<script type="text/javascript" src="../build/bundle.js"></script>',
         replacement: '',
       },
       {
@@ -68,6 +68,16 @@ const CONFIG = {
   ],
   module: {
     rules: [
+      {
+        test: /\.js$/, 
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'], 
+          },
+        },
+      },
       {
         test: /\.(css|scss)$/i,
         use: [
@@ -121,12 +131,6 @@ if (!devMode) {
   CONFIG.output.publicPath = './';
   CONFIG.output.filename = 'js/app.js';
   CONFIG.plugins.push(new MinifyPlugin());
-  CONFIG.module.rules.push({
-    test: [/\.js$/],
-    exclude: [/node_modules/],
-    loader: 'babel-loader',
-    options: { presets: ['env'] },
-  });
 }
 
-module.exports = CONFIG;
+module.exports = CONFIG
