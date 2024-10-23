@@ -39,7 +39,7 @@ closeButtons.forEach((closeBtn) => {
     }
   });
 });
-
+/*
 cards.forEach((card) => {
   card.addEventListener('click', () => {
     togglePopup(popupTeacherInfo);
@@ -56,7 +56,7 @@ cards.forEach((card) => {
     profileName.textContent = `${firstName} ${lastName}`;
   });
 });
-
+*/
 nextButton.addEventListener('click', () => {
   carousel.scrollBy({
     left: 300,
@@ -448,4 +448,133 @@ console.log(findPercentage(testArray, '>70'));
 
 console.log("Test");
 
+// ========Lab 3======== //
+
+// ========Task 1======== //
+let teachersArray = consolidateUsers(randomUserMock, additionalUsers);
+let currentPage = 1;
+const teachersPerPage = 10;
+
+function updateFavorites() {
+  const favoritesContainer = document.querySelector('.favorites-teachers .carousel');
+  favoritesContainer.innerHTML = '';
+
+  const favoriteTeachers = teachersArray.filter(teacher => teacher.favorite);
+
+  favoriteTeachers.forEach(teacher => {
+    const favoriteCard = document.createElement('div');
+    favoriteCard.classList.add('card');
+
+    favoriteCard.innerHTML = `
+      <div class="card-image">
+        <img src="${teacher.picture_large || './images/placeholder.png'}" alt="Profile's photo" class="zoom-image">
+      </div>
+      <div class="card-info">
+        <h4>${teacher.full_name.split(' ')[0]}</h4>
+        <h4>${teacher.full_name.split(' ')[1]}</h4>
+        <p class="country">${teacher.country}</p>
+      </div>
+    `;
+
+    favoriteCard.addEventListener('click', () => {
+      showTeacherDetails(teacher);
+    });
+
+    favoritesContainer.appendChild(favoriteCard);
+  });
+}
+
+const prevPageButton = document.querySelector('.prev-page');
+const nextPageButton = document.querySelector('.next-page');
+
+prevPageButton.addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderTeachers(teachersArray, currentPage);
+  }
+});
+
+nextPageButton.addEventListener('click', () => {
+  const totalPages = Math.ceil(teachersArray.length / teachersPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderTeachers(teachersArray, currentPage);
+  }
+});
+
+function showTeacherDetails(teacher) {
+  const popupTeacherInfo = document.querySelector('.teacher__info');
+  const profileImage = document.querySelector('.profile__image');
+  const profileName = document.querySelector('.teacher__info .name');
+  const profileSpecialty = document.querySelector('.teacher__info .specialty');
+  const profileCity = document.querySelector('.teacher__info .city');
+  const profileAgeSex = document.querySelector('.teacher__info .age-sex');
+  const profileEmail = document.querySelector('.teacher__info .email');
+  const profilePhone = document.querySelector('.teacher__info .phone');
+  const favoriteButton = document.querySelector('.favorite-button');
+
+  
+
+  profileImage.style.backgroundImage = `url(${teacher.picture_large || './images/placeholder.png'})`;
+  profileName.textContent = teacher.full_name;
+  profileSpecialty.textContent = teacher.course;
+  profileCity.textContent = `${teacher.city}, ${teacher.country}`;
+  profileAgeSex.textContent = `${teacher.age}, ${teacher.gender}`;
+  profileEmail.textContent = teacher.email;
+  profilePhone.textContent = teacher.phone;
+
+  favoriteButton.src = teacher.favorite ? '../images/filled-star.svg' : '../images/star.svg';
+
+  favoriteButton.onclick = () => {
+    teacher.favorite = !teacher.favorite;
+    favoriteButton.src = teacher.favorite ? '../images/filled-star.svg' : '../images/star.svg';
+
+    updateFavorites();
+
+    renderTeachers(teachersArray, currentPage);
+  };
+
+  togglePopup(popupTeacherInfo);
+}
+
+function renderTeachers(teachers, page = 1) {
+  const teachersContainer = document.querySelector('.teachers-profiles');
+  teachersContainer.innerHTML = ''; 
+
+  const startIndex = (page - 1) * teachersPerPage;
+  const endIndex = startIndex + teachersPerPage;
+  const teachersToDisplay = teachers.slice(startIndex, endIndex);
+
+  teachersToDisplay.forEach(teacher => {
+    const teacherCard = document.createElement('div');
+    teacherCard.classList.add('card');
+
+    const favoriteSign = teacher.favorite ? `
+      <div class="card-sign">
+        <img src="./images/pngwing.com.png" alt="Star sign">
+      </div>` : '';
+
+    teacherCard.innerHTML = `
+      ${favoriteSign}
+      <div class="card-image">
+        <img src="${teacher.picture_large || './images/placeholder.png'}" alt="Profile's photo" class="zoom-image">
+      </div>
+      <div class="card-info">
+        <h4>${teacher.full_name.split(' ')[0]}</h4>
+        <h4>${teacher.full_name.split(' ')[1]}</h4>
+        <p class="specialization">${teacher.course}</p>
+        <p class="country">${teacher.country}</p>
+      </div>
+    `;
+
+    teacherCard.addEventListener('click', () => {
+      showTeacherDetails(teacher);
+    });
+
+    teachersContainer.appendChild(teacherCard);
+  });
+}
+
+renderTeachers(teachersArray, currentPage);
+updateFavorites();
 // console.log(testModules.hello);

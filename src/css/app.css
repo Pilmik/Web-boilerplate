@@ -615,10 +615,17 @@ input[type="color"] {
 }
 
 .star-icon {
+  cursor: pointer;
   width: 28px;
+  height: 28px;
   position: absolute;
   top: 0;
   right: 0;
+  transition: transform 0.2s ease;
+}
+
+.star-icon:hover {
+  transform: scale(1.2);
 }
 
 .toggle__map {
