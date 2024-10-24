@@ -69,12 +69,12 @@ const CONFIG = {
   module: {
     rules: [
       {
-        test: /\.js$/, 
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'], 
+            presets: ['@babel/preset-env'],
           },
         },
       },
@@ -133,4 +133,4 @@ if (!devMode) {
   CONFIG.plugins.push(new MinifyPlugin());
 }
 
-module.exports = CONFIG
+module.exports = CONFIG;

@@ -110,7 +110,7 @@ nav > a:hover {
   color: rgb(190, 62, 48);
 }
 
-.add-teacher-button {
+.add-teacher-button, .add-teacher {
   justify-self: end;
   height: 2.5rem;
   font-size: 1.2rem;
@@ -304,6 +304,10 @@ th {
   visibility: hidden;
   transition: visibility 0.3s, opacity 0.3s ease-in-out;
   opacity: 0;
+}
+
+.rotate {
+  transform: rotate(180deg);
 }
 
 th:hover {
@@ -576,6 +580,11 @@ input[type="color"] {
   font-weight: 600;
 }
 
+.error-container p {
+  color: red;
+  margin: 0;
+}
+
 /* Модальне вікно 2 */
 
 .teacher__info .popup__content {
@@ -723,6 +732,7 @@ input[type="color"] {
     margin-bottom: 2rem;
   }
 
+  .add-teacher-button,
   .add-teacher-button {
     height: 32px;
     width: 120px;
@@ -772,6 +782,7 @@ input[type="color"] {
   .profile__image {
     height: 200px;
     width: 200px;
+    margin-right: 12px;
   }
 
   .teacher__info h2 {
@@ -813,18 +824,16 @@ input[type="color"] {
   .profile__image {
     height: 150px;
     width: 150px;
+    margin-right: 8px;
   }
 
   .teacher__info h2 {
     font-size: 1rem;
   }
 
-  .teacher__info h3 {
-    margin-bottom: 0.7rem;
-  }
-
   .profile__details p,
-  .profile__details a {
+  .profile__details a,
+  .teacher__info h3 {
     margin-bottom: 0.7rem;
   }
 }
