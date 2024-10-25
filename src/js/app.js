@@ -383,14 +383,55 @@ function findPercentage(users, input) {
 
   return Number(percentage.toFixed(2));
 }
+// ======= Lab 04====== //
+async function fetchUsers() {
+  try {
+    const response = await fetch('https://randomuser.me/api/?results=50');
+    const data = await response.json();
+    
+    const users = [];
+    const uniqueUserSet = new Set();
+
+    consolidateUsers(data.results, []).forEach(user => {
+      if (!uniqueUserSet.has(user.email)) {
+        uniqueUserSet.add(user.email);
+        users.push(user);
+      }
+    });
+    return users.filter(user => {
+      return isValidUser(user).isValid;
+    });
+
+  } catch (error) {
+    console.error('Error when getting users:', error);
+    return [];
+  }
+}
 
 // ========Lab 3======== //
 
 // ========Task 1======== //
+/*
 const teachersArray = consolidateUsers(randomUserMock, additionalUsers).filter((teacher) => {
   return isValidUser(teacher).isValid;
 });
-let filteredTeachersArray = [...teachersArray];
+*/
+let teachersArray = [];
+let filteredTeachersArray = [];
+
+fetchUsers().then(users => {
+  teachersArray = [...users];
+
+  filteredTeachersArray = [...teachersArray];
+  console.log('Teachers Array:', teachersArray);
+  console.log('Filtered Teachers Array:', filteredTeachersArray);
+
+  renderTeachers(filteredTeachersArray);
+  renderTable(filteredTeachersArray);
+  generateRegions();
+  generateSpecialty();
+  updateFavorites();
+});
 
 let currentPage = 1;
 const teachersPerPage = 10;
@@ -632,11 +673,6 @@ function renderTeachers(teachers, page = 1) {
   });
 }
 
-renderTeachers(teachersArray, currentPage);
-generateRegions();
-generateSpecialty();
-updateFavorites();
-
 // ========Task 2======== //
 
 function applyFilters() {
@@ -833,5 +869,6 @@ document.querySelector('.add-teacher.button').addEventListener('click', (event) 
 
   closePopup();
 });
+
 
 // console.log(testModules.hello);
