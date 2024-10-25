@@ -387,15 +387,37 @@ function findPercentage(users, input) {
 // ========Lab 3======== //
 
 // ========Task 1======== //
-const teachersArray = consolidateUsers(randomUserMock, additionalUsers);
+const teachersArray = consolidateUsers(randomUserMock, additionalUsers).filter((teacher) => {
+  return isValidUser(teacher).isValid;
+});
 let filteredTeachersArray = [...teachersArray];
 
 let currentPage = 1;
 const teachersPerPage = 10;
-const currentFavoritePage = 1;
 
-const favoritesPerPage = 5;
+let currentFavoritePage = 1;
+let favoritesPerPage = 5;
 let totalFavoritePages = 0;
+
+function calculateFavoritesPerPage() {
+  const screenWidth = window.innerWidth;
+
+  if (screenWidth > 1200) {
+    favoritesPerPage = 5; 
+  } else if (screenWidth > 900) {
+    favoritesPerPage = 4;
+  } else if (screenWidth > 600) {
+    favoritesPerPage = 3;
+  } else {
+    favoritesPerPage = 2;
+  }
+}
+
+calculateFavoritesPerPage();
+window.addEventListener('resize', () => {
+  calculateFavoritesPerPage();
+  updateFavorites(); 
+});
 
 function updateFavorites() {
   const favoritesContainer = document.querySelector('.favorites-teachers .carousel');
@@ -435,17 +457,25 @@ function updateFavorites() {
 }
 
 nextButton.addEventListener('click', () => {
-  carousel.scrollBy({
-    left: 300,
-    behavior: 'smooth',
-  });
+  if (currentFavoritePage < totalFavoritePages) {
+    currentFavoritePage++;
+    updateFavorites();
+    carousel.scrollBy({
+      left: 300,
+      behavior: 'smooth',
+    });
+  }
 });
 
 prevButton.addEventListener('click', () => {
-  carousel.scrollBy({
-    left: -300,
-    behavior: 'smooth',
-  });
+  if (currentFavoritePage > 1) {
+    currentFavoritePage--;
+    updateFavorites();
+    carousel.scrollBy({
+      left: -300,
+      behavior: 'smooth',
+    });
+  }
 });
 
 const prevPageButton = document.querySelector('.prev-page');

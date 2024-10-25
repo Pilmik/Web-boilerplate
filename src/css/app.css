@@ -357,6 +357,7 @@ tr:nth-child(even) {
 
 .carousel {
   display: flex;
+  justify-content: center;
   overflow: hidden;
   overflow-x: auto;
   scroll-behavior: smooth;
